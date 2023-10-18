@@ -12,7 +12,7 @@ const fetchMeetings = (query, callback, isCSV, isKML) => {
 const handleMeetingsData = (meetings) => {
   if (isProcessingCSV) {
     const csvContent = `data:text/csv;charset=utf-8,${encodeURIComponent(
-      convertToCSV(meetings),
+      convertToCSV(meetings)
     )}`;
     const downloadLink = document.getElementById("downloadLink");
     downloadLink.href = csvContent;
@@ -21,7 +21,7 @@ const handleMeetingsData = (meetings) => {
 
   if (isProcessingKML) {
     const kmlContent = `data:text/xml;charset=utf-8,${encodeURIComponent(
-      convertToKML(meetings),
+      convertToKML(meetings)
     )}`;
     const kmlDownloadLink = document.getElementById("kmlDownloadLink");
     kmlDownloadLink.href = kmlContent;
