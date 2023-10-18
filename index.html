@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>BMLT CSV Export</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+<h1>BMLT CSV Export</h1>
+<div id="export-form">
+  <label for="query">BMLT URL Query:</label>
+  <input type="text" id="query" required>
+  <br>
+  <button onclick="exportToCSV()">Export CSV</button>
+  <a id="downloadLink" style="display: none;" download="BMLT_data.csv">Download CSV</a>
+</div>
+<script src="assets/js/util.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

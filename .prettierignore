@@ -1,0 +1,5 @@
+*.html
+*.min.js
+/build
+/pages
+build

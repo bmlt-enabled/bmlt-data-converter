@@ -1,0 +1,15 @@
+{
+  "name": "bmlt-data-converter",
+  "scripts": {
+    "lint": "npx eslint assets/js/main.js",
+    "lint:fix": "npm run lint assets/js/main.js --fix",
+    "prettier": "npx prettier assets/js --check",
+    "prettier:fix": "npm run prettier assets/js --write"
+  },
+  "author": "pjaudiomv",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "prettier": "2.8.8"
+  }
+}
