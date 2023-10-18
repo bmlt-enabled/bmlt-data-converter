@@ -1,21 +1,21 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-  <title>BMLT CSV Export</title>
+  <title>BMLT Data Converter</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <link rel="stylesheet" href="assets/css/main.css" />
 </head>
 <body>
-<h1>BMLT CSV Export</h1>
+<h1>BMLT Data Converter</h1>
 <div id="export-form">
   <label for="query">BMLT URL Query:</label>
   <input type="text" id="query" required>
   <br>
-  <button onclick="exportToCSV()">Export CSV</button>
+  <button onclick="exportData()">Generate Export Data</button>
   <a id="downloadLink" style="display: none;" download="BMLT_data.csv">Download CSV</a>
+  <a id="kmlDownloadLink" style="display: none;" download="BMLT_data.kml">Download KML</a>
 </div>
-<script src="assets/js/util.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
