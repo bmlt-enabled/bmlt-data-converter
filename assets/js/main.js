@@ -238,15 +238,20 @@ class MeetingDataProcessor {
 
   // start the export process
   exportData(query) {
+    try {
+      new URL(query);
+      if (!query.includes("/client_interface/json")) {
+        throw new Error("Query does not contain a valid endpoint.");
+      }
+    } catch (error) {
+      MeetingDataProcessor.hideLinks();
+      MeetingDataProcessor.displayError(`Invalid query URL: ${error.message}`);
+      return;
+    }
     const updatedQuery = query.replace(
       "/client_interface/json/",
       "/client_interface/jsonp/"
     );
-    if (!updatedQuery.includes("/client_interface/jsonp")) {
-      MeetingDataProcessor.hideLinks();
-      MeetingDataProcessor.displayError("Invalid BMLT query URL.");
-      return;
-    }
     const isCSV = true;
     const isKML = updatedQuery.includes("GetSearchResults");
     this.fetchMeetings(updatedQuery, isCSV, isKML).catch((error) =>

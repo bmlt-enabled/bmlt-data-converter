@@ -16,6 +16,12 @@ h1 {
 	box-sizing: border-box;
 }
 
+#errorMessages {
+	color: red;
+	text-align: center;
+	padding-top: 15px
+}
+
 label {
 	display: block;
 	margin-bottom: 10px;
