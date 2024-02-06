@@ -11,8 +11,16 @@ class MeetingDataProcessor {
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
       const callbackName = `jsonpCallback_${Date.now()}`;
+      let timeoutId = setTimeout(() => {
+        const errorMsg = "Timeout: No response from server";
+        MeetingDataProcessor.displayError(errorMsg);
+        document.body.removeChild(script);
+        delete window[callbackName];
+        reject(new Error(errorMsg));
+      }, 10000); // 10 seconds timeout
 
       window[callbackName] = (data) => {
+        clearTimeout(timeoutId);
         document.body.removeChild(script);
         delete window[callbackName];
 
@@ -231,6 +239,7 @@ class MeetingDataProcessor {
   // start the export process
   exportData(query) {
     if (!query.includes("/client_interface/jsonp")) {
+      MeetingDataProcessor.hideLinks();
       MeetingDataProcessor.displayError(
         "Invalid BMLT query URL, must use jsonp endpoint."
       );
