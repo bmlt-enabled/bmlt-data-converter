@@ -4,8 +4,10 @@ class MeetingDataProcessor {
     this.isProcessingKML = false;
   }
 
-  // D ynamically load JSONP data
+  // Load JSONP data
   fetchMeetings(query, isCSV, isKML) {
+    MeetingDataProcessor.clearError();
+    MeetingDataProcessor.hideLinks();
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
       const callbackName = `jsonpCallback_${Date.now()}`;
@@ -13,12 +15,24 @@ class MeetingDataProcessor {
       window[callbackName] = (data) => {
         document.body.removeChild(script);
         delete window[callbackName];
-        this.handleMeetingsData(data, isCSV, isKML);
-        resolve(data);
+
+        // check for empty array
+        if (Array.isArray(data) && data.length === 0) {
+          const errorMsg = "No data found";
+          MeetingDataProcessor.displayError(errorMsg);
+          reject(new Error(errorMsg));
+        } else {
+          this.handleMeetingsData(data, isCSV, isKML);
+          resolve(data);
+        }
       };
 
       script.src = `${query}&callback=${callbackName}`;
-      script.onerror = () => reject(new Error("Script loading failed"));
+      script.onerror = () => {
+        const errorMsg = "Error loading data";
+        MeetingDataProcessor.displayError(errorMsg);
+        reject(new Error(errorMsg));
+      };
       document.body.appendChild(script);
 
       this.isProcessingCSV = isCSV;
@@ -26,7 +40,27 @@ class MeetingDataProcessor {
     });
   }
 
-  // handle data once it's fetched
+  static displayError(message) {
+    const errorContainer = document.getElementById("errorMessages");
+    if (errorContainer) {
+      errorContainer.textContent = message;
+      errorContainer.style.display = "block";
+    } else {
+      console.error("Error container not found in the document.");
+    }
+  }
+
+  static clearError() {
+    const errorContainer = document.getElementById("errorMessages");
+    if (errorContainer) {
+      errorContainer.style.display = "none";
+      errorContainer.textContent = "";
+    } else {
+      console.error("Error container not found in the document.");
+    }
+  }
+
+  // Handle data once it's fetched
   handleMeetingsData(meetings, isCSV, isKML) {
     if (isCSV) {
       this.exportCSV(meetings);
@@ -49,11 +83,18 @@ class MeetingDataProcessor {
   // KML export functionality
   exportKML(meetings) {
     const kmlContent = `data:text/xml;charset=utf-8,${encodeURIComponent(
-      this.convertToKML(meetings)
+      this.constructor.convertToKML(meetings)
     )}`;
     const kmlDownloadLink = document.getElementById("kmlDownloadLink");
     kmlDownloadLink.href = kmlContent;
     kmlDownloadLink.style.display = "block";
+  }
+
+  static hideLinks() {
+    const downloadLink = document.getElementById("downloadLink");
+    downloadLink.style.display = "none";
+    const kmlDownloadLink = document.getElementById("kmlDownloadLink");
+    kmlDownloadLink.style.display = "none";
   }
 
   // Convert data to CSV
@@ -80,7 +121,7 @@ class MeetingDataProcessor {
   }
 
   // Convert data to KML
-  convertToKML(data) {
+  static convertToKML(data) {
     let kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>`;
@@ -92,8 +133,8 @@ class MeetingDataProcessor {
         const lat = parseFloat(meeting["latitude"]);
         if (!lng || !lat) return "";
 
-        const description = this.constructor.prepareSimpleLine(meeting);
-        const address = this.constructor.prepareSimpleLine(meeting, false);
+        const description = MeetingDataProcessor.prepareSimpleLine(meeting);
+        const address = MeetingDataProcessor.prepareSimpleLine(meeting, false);
 
         return `    <Placemark>
       <name>${name}</name>
@@ -190,7 +231,9 @@ class MeetingDataProcessor {
   // start the export process
   exportData(query) {
     if (!query.includes("/client_interface/jsonp")) {
-      alert("Invalid BMLT query URL, must use jsonp endpoint.");
+      MeetingDataProcessor.displayError(
+        "Invalid BMLT query URL, must use jsonp endpoint."
+      );
       return;
     }
     const isCSV = true;
@@ -201,6 +244,7 @@ class MeetingDataProcessor {
   }
 }
 
+// Triggers data export process, bound to button click event
 function exportData() {
   const query = document.getElementById("query").value;
   const processor = new MeetingDataProcessor();
