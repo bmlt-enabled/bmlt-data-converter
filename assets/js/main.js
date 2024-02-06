@@ -238,16 +238,18 @@ class MeetingDataProcessor {
 
   // start the export process
   exportData(query) {
-    if (!query.includes("/client_interface/jsonp")) {
+    const updatedQuery = query.replace(
+      "/client_interface/json/",
+      "/client_interface/jsonp/"
+    );
+    if (!updatedQuery.includes("/client_interface/jsonp")) {
       MeetingDataProcessor.hideLinks();
-      MeetingDataProcessor.displayError(
-        "Invalid BMLT query URL, must use jsonp endpoint."
-      );
+      MeetingDataProcessor.displayError("Invalid BMLT query URL.");
       return;
     }
     const isCSV = true;
-    const isKML = query.includes("GetSearchResults");
-    this.fetchMeetings(query, isCSV, isKML).catch((error) =>
+    const isKML = updatedQuery.includes("GetSearchResults");
+    this.fetchMeetings(updatedQuery, isCSV, isKML).catch((error) =>
       console.error("Error fetching meetings:", error)
     );
   }
