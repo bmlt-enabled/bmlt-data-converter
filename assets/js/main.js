@@ -266,3 +266,10 @@ function exportData() {
   const processor = new MeetingDataProcessor();
   processor.exportData(query);
 }
+
+document.getElementById("query").addEventListener("keypress", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    exportData();
+  }
+});
