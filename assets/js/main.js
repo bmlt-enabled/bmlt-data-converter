@@ -80,9 +80,11 @@ class MeetingDataProcessor {
 
   // CSV export functionality
   exportCSV(meetings) {
-    const csvContent = `data:text/csv;charset=utf-8,${encodeURIComponent(
-      this.constructor.convertToCSV(meetings)
-    )}`;
+    const convertedCSV = this.constructor.convertToCSV(meetings);
+    const csvContent = MeetingDataProcessor.createDownloadLink(
+      convertedCSV,
+      "text/csv"
+    );
     const downloadLink = document.getElementById("downloadLink");
     downloadLink.href = csvContent;
     downloadLink.style.display = "block";
@@ -90,12 +92,19 @@ class MeetingDataProcessor {
 
   // KML export functionality
   exportKML(meetings) {
-    const kmlContent = `data:text/xml;charset=utf-8,${encodeURIComponent(
-      this.constructor.convertToKML(meetings)
-    )}`;
+    const convertedKML = this.constructor.convertToKML(meetings);
+    const kmlContent = MeetingDataProcessor.createDownloadLink(
+      convertedKML,
+      "application/vnd.google-earth.kml+xml"
+    );
     const kmlDownloadLink = document.getElementById("kmlDownloadLink");
     kmlDownloadLink.href = kmlContent;
     kmlDownloadLink.style.display = "block";
+  }
+
+  static createDownloadLink(data, type) {
+    const blob = new Blob([data], { type });
+    return URL.createObjectURL(blob);
   }
 
   static hideLinks() {
@@ -107,16 +116,23 @@ class MeetingDataProcessor {
 
   // Convert data to CSV
   static convertToCSV(data) {
+    if (!Array.isArray(data) || data.length === 0) {
+      MeetingDataProcessor.displayError("No data found");
+      throw new Error("No data found");
+    }
     const csvRows = [];
     const keys = Object.keys(data[0]);
     csvRows.push(keys.join(","));
 
     data.forEach((row) => {
       const values = keys.map((key) => {
-        let value = row[key];
+        let value = row[key] === null ? "" : row[key];
         if (
           typeof value === "string" &&
-          (value.includes(",") || value.includes('"'))
+          (value.includes(",") ||
+            value.includes('"') ||
+            value.includes("\n") ||
+            value.includes("\r"))
         ) {
           value = `"${value.replace(/"/g, '""')}"`;
         }
