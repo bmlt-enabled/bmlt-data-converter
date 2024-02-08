@@ -85,9 +85,9 @@ class MeetingDataProcessor {
       convertedCSV,
       "text/csv"
     );
-    const downloadLink = document.getElementById("downloadLink");
-    downloadLink.href = csvContent;
-    downloadLink.style.display = "block";
+    const csvDownloadLink = document.getElementById("csvDownloadLink");
+    csvDownloadLink.href = csvContent;
+    csvDownloadLink.style.display = "block";
   }
 
   // KML export functionality
@@ -108,8 +108,8 @@ class MeetingDataProcessor {
   }
 
   static hideLinks() {
-    const downloadLink = document.getElementById("downloadLink");
-    downloadLink.style.display = "none";
+    const csvDownloadLink = document.getElementById("csvDownloadLink");
+    csvDownloadLink.style.display = "none";
     const kmlDownloadLink = document.getElementById("kmlDownloadLink");
     kmlDownloadLink.style.display = "none";
   }
