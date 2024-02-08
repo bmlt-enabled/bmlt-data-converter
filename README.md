@@ -1,4 +1,5 @@
 # BMLT Data Converter
 
-* Converts BMLT meeting data from a JSON endpoint to CSV or KML
+* Converts BMLT data from JSON to CSV or KML
     * Note that export of KML is only supported with GetSearchResults.
+* Use your semantic interface to build query url
