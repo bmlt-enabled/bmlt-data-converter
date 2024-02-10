@@ -8,12 +8,8 @@ h1 {
 
 #export-form {
 	max-width: 800px;
-	margin: 0 auto;
-	margin-top: 20px;
-	padding-top: 1px;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-bottom: 20px;
+	margin: 20px auto 0;
+	padding: 1px 20px 20px;
 	background-color: #f7f7f7;
 	border: 1px solid #ccc;
 	border-radius: 5px;
@@ -23,7 +19,8 @@ h1 {
 #errorMessages {
 	color: red;
 	text-align: center;
-	padding-top: 15px
+	padding-top: 15px;
+	display: none;
 }
 
 label {
