@@ -3,3 +3,5 @@
 /build
 /pages
 build
+node_modules/
+dist/

@@ -1,28 +1,30 @@
 class MeetingDataProcessor {
+  private isProcessingCSV: boolean;
+  private isProcessingKML: boolean;
   constructor() {
     this.isProcessingCSV = false;
     this.isProcessingKML = false;
   }
 
   // Load JSONP data
-  fetchMeetings(query, isCSV, isKML) {
+  fetchMeetings(query: string, isCSV: boolean, isKML: boolean): Promise<any> {
     MeetingDataProcessor.clearError();
     MeetingDataProcessor.hideLinks();
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
       const callbackName = `jsonpCallback_${Date.now()}`;
-      let timeoutId = setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         const errorMsg = "Timeout: No response from server";
         MeetingDataProcessor.displayError(errorMsg);
         document.body.removeChild(script);
-        delete window[callbackName];
+        delete window[callbackName as keyof Window];
         reject(new Error(errorMsg));
       }, 10000); // 10 seconds timeout
 
-      window[callbackName] = (data) => {
+      (window as any)[callbackName] = (data: any) => {
         clearTimeout(timeoutId);
         document.body.removeChild(script);
-        delete window[callbackName];
+        delete window[callbackName as keyof Window];
 
         // check for empty array
         if (Array.isArray(data) && data.length === 0) {
@@ -48,7 +50,7 @@ class MeetingDataProcessor {
     });
   }
 
-  static displayError(message) {
+  static displayError(message: string | null): void {
     const errorContainer = document.getElementById("errorMessages");
     if (errorContainer) {
       errorContainer.textContent = message;
@@ -58,7 +60,7 @@ class MeetingDataProcessor {
     }
   }
 
-  static clearError() {
+  static clearError(): void {
     const errorContainer = document.getElementById("errorMessages");
     if (errorContainer) {
       errorContainer.style.display = "none";
@@ -69,7 +71,7 @@ class MeetingDataProcessor {
   }
 
   // Handle data once it's fetched
-  handleMeetingsData(meetings, isCSV, isKML) {
+  handleMeetingsData(meetings: any, isCSV: boolean, isKML: boolean): void {
     if (isCSV) {
       this.exportCSV(meetings);
     }
@@ -79,43 +81,51 @@ class MeetingDataProcessor {
   }
 
   // CSV export functionality
-  exportCSV(meetings) {
-    const convertedCSV = this.constructor.convertToCSV(meetings);
+  exportCSV(meetings: any): void {
+    const convertedCSV = MeetingDataProcessor.convertToCSV(meetings);
     const csvContent = MeetingDataProcessor.createDownloadLink(
       convertedCSV,
-      "text/csv"
+      "text/csv",
     );
     const csvDownloadLink = document.getElementById("csvDownloadLink");
-    csvDownloadLink.href = csvContent;
-    csvDownloadLink.style.display = "block";
+    if (csvDownloadLink) {
+      (csvDownloadLink as HTMLAnchorElement).href = csvContent;
+      csvDownloadLink.style.display = "block";
+    }
   }
 
   // KML export functionality
-  exportKML(meetings) {
-    const convertedKML = this.constructor.convertToKML(meetings);
+  exportKML(meetings: any): void {
+    const convertedKML = MeetingDataProcessor.convertToKML(meetings);
     const kmlContent = MeetingDataProcessor.createDownloadLink(
       convertedKML,
-      "application/vnd.google-earth.kml+xml"
+      "application/vnd.google-earth.kml+xml",
     );
     const kmlDownloadLink = document.getElementById("kmlDownloadLink");
-    kmlDownloadLink.href = kmlContent;
-    kmlDownloadLink.style.display = "block";
+    if (kmlDownloadLink) {
+      (kmlDownloadLink as HTMLAnchorElement).href = kmlContent;
+      kmlDownloadLink.style.display = "block";
+    }
   }
 
-  static createDownloadLink(data, type) {
+  static createDownloadLink(data: BlobPart, type: string): string {
     const blob = new Blob([data], { type });
     return URL.createObjectURL(blob);
   }
 
   static hideLinks() {
     const csvDownloadLink = document.getElementById("csvDownloadLink");
-    csvDownloadLink.style.display = "none";
+    if (csvDownloadLink) {
+      csvDownloadLink.style.display = "none";
+    }
     const kmlDownloadLink = document.getElementById("kmlDownloadLink");
-    kmlDownloadLink.style.display = "none";
+    if (kmlDownloadLink) {
+      kmlDownloadLink.style.display = "none";
+    }
   }
 
   // Convert data to CSV
-  static convertToCSV(data) {
+  static convertToCSV(data: any[]): string {
     if (!Array.isArray(data) || data.length === 0) {
       MeetingDataProcessor.displayError("No data found");
       throw new Error("No data found");
@@ -145,7 +155,7 @@ class MeetingDataProcessor {
   }
 
   // Convert data to KML
-  static convertToKML(data) {
+  static convertToKML(data: any[]): string {
     let kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>`;
@@ -181,10 +191,13 @@ class MeetingDataProcessor {
   }
 
   // KML and CSV data preparation
-  static prepareSimpleLine(meeting, withDate = true) {
+  static prepareSimpleLine(
+    meeting: { [x: string]: any },
+    withDate = true,
+  ): string {
     const getLocationInfo = () => {
-      const locationInfo = [];
-      const addInfo = (property) => {
+      const locationInfo: any[] = [];
+      const addInfo = (property: string) => {
         if (property in meeting) {
           const value = meeting[property].trim();
           if (value) {
@@ -226,7 +239,7 @@ class MeetingDataProcessor {
       if (weekdayString && withDate) {
         let dateString = weekdayString;
 
-        if (!isNaN(time)) {
+        if (!isNaN(time.getTime())) {
           dateString += `, ${time.toLocaleTimeString("en-US", {
             hour: "numeric",
             minute: "numeric",
@@ -253,39 +266,52 @@ class MeetingDataProcessor {
   }
 
   // start the export process
-  exportData(query) {
+  exportData(query: string | URL) {
+    let queryUrl: string;
+    if (query instanceof URL) {
+      queryUrl = query.href;
+    } else {
+      queryUrl = query;
+    }
     try {
-      new URL(query);
-      if (!query.includes("/client_interface/json")) {
+      new URL(queryUrl);
+      if (!queryUrl.includes("/client_interface/json")) {
         throw new Error("Query does not contain a valid endpoint.");
       }
     } catch (error) {
       MeetingDataProcessor.hideLinks();
-      MeetingDataProcessor.displayError(`Invalid query URL: ${error.message}`);
+      MeetingDataProcessor.displayError(
+        `Invalid query URL: ${(error as Error).message}`,
+      );
       return;
     }
-    const updatedQuery = query.replace(
+    const updatedQuery = queryUrl.replace(
       "/client_interface/json/",
-      "/client_interface/jsonp/"
+      "/client_interface/jsonp/",
     );
     const isCSV = true;
     const isKML = updatedQuery.includes("GetSearchResults");
     this.fetchMeetings(updatedQuery, isCSV, isKML).catch((error) =>
-      console.error("Error fetching meetings:", error)
+      console.error("Error fetching meetings:", error),
     );
   }
 }
 
 // Triggers data export process, bound to button click event
-function exportData() {
-  const query = document.getElementById("query").value;
-  const processor = new MeetingDataProcessor();
-  processor.exportData(query);
+function exportData(): void {
+  const queryElement = document.getElementById("query");
+  if (queryElement instanceof HTMLInputElement) {
+    const query = queryElement.value;
+    const processor = new MeetingDataProcessor();
+    processor.exportData(query);
+  }
 }
 
-document.getElementById("query").addEventListener("keypress", function (event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    exportData();
-  }
-});
+document
+  .getElementById("query")
+  ?.addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      exportData();
+    }
+  });
