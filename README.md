@@ -3,3 +3,11 @@
 * Converts BMLT data from JSON to CSV or KML
     * Note that export of KML is only supported with GetSearchResults.
 * Use your semantic interface to build query url
+
+#### Steps to Build Locally
+
+Using NPM
+```
+npm install
+npm start
+```
