@@ -7,7 +7,9 @@ help:  ## Print the help documentation
 
 .PHONY: build
 build:  ## Build
+	npm run build
 	git archive --format=zip --output=${ZIP_FILENAME} $(COMMIT)
+	zip -r ${ZIP_FILENAME} dist
 	mkdir -p ${BUILD_DIR} && mv ${ZIP_FILENAME} ${BUILD_DIR}
 
 .PHONY: pages
@@ -17,6 +19,7 @@ pages:  ## Preps GitHub Pages Deploy
 .PHONY: clean
 clean:  ## clean
 	rm -rf ${BUILD_DIR}
+	rm -rf dist
 
 .PHONY: image-build
 image-build:  ## Builds Docker Image

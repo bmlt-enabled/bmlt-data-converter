@@ -1,15 +1,27 @@
 {
   "name": "bmlt-data-converter",
   "scripts": {
-    "lint": "npx eslint assets/js/main.js",
-    "lint:fix": "npm run lint assets/js/main.js --fix",
-    "prettier": "npx prettier assets/js --check",
-    "prettier:fix": "npm run prettier assets/js --write"
+    "build": "tsc -p . && cp src/css/main.css dist/main.css",
+    "lint": "npx eslint src/ts/main.ts",
+    "lint:fix": "npm run lint src/ts/main.ts --fix",
+    "prettier": "npx prettier src/ts --check",
+    "prettier:fix": "npx prettier --write src/ts/main.ts",
+    "serve": "http-server . -o",
+    "watch": "nodemon --watch src/ts/*.ts --watch src/css/*.css --exec npm run build",
+    "start": "concurrently \"npm run watch\" \"npm run serve\""
   },
   "author": "pjaudiomv",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^7.32.0",
-    "prettier": "2.8.8"
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
+    "@typescript-eslint/parser": "^7.0.1",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "http-server": "^14.1.1",
+    "nodemon": "^3.0.3",
+    "prettier": "^3.0.0",
+    "typescript": "^4.4.4"
   }
 }
