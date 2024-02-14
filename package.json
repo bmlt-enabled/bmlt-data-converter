@@ -1,12 +1,12 @@
 {
   "name": "bmlt-data-converter",
   "scripts": {
-    "build": "tsc -p . && cp src/css/main.css dist/main.css",
+    "build": "tsc -p . && cp src/css/main.css dist/main.css && cp -r dist public",
     "lint": "npx eslint src/ts/main.ts",
     "lint:fix": "npm run lint src/ts/main.ts --fix",
     "prettier": "npx prettier src/ts --check",
     "prettier:fix": "npx prettier --write src/ts/main.ts",
-    "serve": "http-server . -o",
+    "serve": "http-server public -o",
     "watch": "nodemon --watch src/ts/*.ts --watch src/css/*.css --exec npm run build",
     "start": "concurrently \"npm run watch\" \"npm run serve\""
   },
