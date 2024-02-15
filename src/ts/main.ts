@@ -7,47 +7,86 @@ class MeetingDataProcessor {
   }
 
   // Load JSONP data
-  fetchMeetings(query: string, isCSV: boolean, isKML: boolean): Promise<any> {
+  fetchData(query: string, isCSV: boolean, isKML: boolean): Promise<any> {
+    this.prepareForDataFetch();
+    return new Promise(
+      (resolve: (value: any) => void, reject: (reason?: any) => void) => {
+        const callbackName = this.setupJSONPCallback(resolve, reject);
+        this.loadJSONPData(query, callbackName, reject);
+        this.isProcessingCSV = isCSV;
+        this.isProcessingKML = isKML;
+      },
+    );
+  }
+
+  private prepareForDataFetch(): void {
     MeetingDataProcessor.clearError();
     MeetingDataProcessor.hideLinks();
-    return new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      const callbackName = `jsonpCallback_${Date.now()}`;
-      const timeoutId = setTimeout(() => {
-        const errorMsg = "Timeout: No response from server";
-        MeetingDataProcessor.displayError(errorMsg);
-        document.body.removeChild(script);
-        delete window[callbackName as keyof Window];
-        reject(new Error(errorMsg));
-      }, 10000); // 10 seconds timeout
+  }
 
-      (window as any)[callbackName] = (data: any) => {
-        clearTimeout(timeoutId);
-        document.body.removeChild(script);
-        delete window[callbackName as keyof Window];
+  private setupJSONPCallback(
+    resolve: (value: any) => void,
+    reject: (reason?: any) => void,
+  ): string {
+    const callbackName = `jsonpCallback_${Date.now()}`;
+    const timeoutId = this.setupTimeout(callbackName, reject);
 
-        // check for empty array
-        if (Array.isArray(data) && data.length === 0) {
-          const errorMsg = "No data found";
-          MeetingDataProcessor.displayError(errorMsg);
-          reject(new Error(errorMsg));
-        } else {
-          this.handleMeetingsData(data, isCSV, isKML);
-          resolve(data);
-        }
-      };
+    (window as any)[callbackName] = (data: any) => {
+      clearTimeout(timeoutId);
+      this.cleanupJSONP(callbackName);
 
-      script.src = `${query}&callback=${callbackName}`;
-      script.onerror = () => {
-        const errorMsg = "Error loading data";
-        MeetingDataProcessor.displayError(errorMsg);
-        reject(new Error(errorMsg));
-      };
-      document.body.appendChild(script);
+      if (Array.isArray(data) && data.length === 0) {
+        this.handleNoDataFound(reject);
+      } else {
+        this.handleMeetingsData(
+          data,
+          this.isProcessingCSV,
+          this.isProcessingKML,
+        );
+        resolve(data);
+      }
+    };
 
-      this.isProcessingCSV = isCSV;
-      this.isProcessingKML = isKML;
-    });
+    return callbackName;
+  }
+
+  private setupTimeout(
+    callbackName: string,
+    reject: (reason?: any) => void,
+  ): number {
+    return window.setTimeout(() => {
+      const errorMsg = "Timeout: No response from server";
+      MeetingDataProcessor.displayError(errorMsg);
+      this.cleanupJSONP(callbackName);
+      reject(new Error(errorMsg));
+    }, 10000); // 10 seconds timeout
+  }
+
+  private cleanupJSONP(callbackName: string): void {
+    const script = document.querySelector(`script[src*="${callbackName}"]`);
+    if (script) document.body.removeChild(script);
+    delete window[callbackName as keyof Window];
+  }
+
+  private handleNoDataFound(reject: (reason?: any) => void): void {
+    const errorMsg = "No data found";
+    MeetingDataProcessor.displayError(errorMsg);
+    reject(new Error(errorMsg));
+  }
+
+  private loadJSONPData(
+    query: string,
+    callbackName: string,
+    reject: (reason?: any) => void,
+  ): void {
+    const script = document.createElement("script");
+    script.src = `${query}&callback=${callbackName}`;
+    script.onerror = () => {
+      const errorMsg = "Error loading data";
+      MeetingDataProcessor.displayError(errorMsg);
+      reject(new Error(errorMsg));
+    };
+    document.body.appendChild(script);
   }
 
   static displayError(message: string | null): void {
@@ -291,7 +330,7 @@ class MeetingDataProcessor {
     );
     const isCSV = true;
     const isKML = updatedQuery.includes("GetSearchResults");
-    this.fetchMeetings(updatedQuery, isCSV, isKML).catch((error) =>
+    this.fetchData(updatedQuery, isCSV, isKML).catch((error) =>
       console.error("Error fetching meetings:", error),
     );
   }

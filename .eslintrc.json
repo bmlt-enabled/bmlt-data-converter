@@ -19,6 +19,9 @@
     },
     "rules": {
         "prettier/prettier": 2,
-        "@typescript-eslint/no-explicit-any": "off"
+        "@typescript-eslint/no-explicit-any": "off",
+        "max-len": ["error", {
+            "code": 120
+        }]
     }
 }
