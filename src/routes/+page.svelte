@@ -1,4 +1,6 @@
 <script lang="ts">
+	import fetchJsonp from 'fetch-jsonp';
+
 	class MeetingDataProcessor {
 		private isProcessingCSV: boolean;
 		private isProcessingKML: boolean;
@@ -9,79 +11,35 @@
 
 		// Load JSONP data
 		fetchData(query: string, isCSV: boolean, isKML: boolean): Promise<any> {
-			this.prepareForDataFetch();
-			return new Promise((resolve: (value: any) => void, reject: (reason?: any) => void) => {
-				const callbackName = this.setupJSONPCallback(resolve, reject);
-				this.loadJSONPData(query, callbackName, reject);
-				this.isProcessingCSV = isCSV;
-				this.isProcessingKML = isKML;
+			MeetingDataProcessor.clearError();
+			MeetingDataProcessor.hideLinks();
+			this.isProcessingCSV = isCSV;
+			this.isProcessingKML = isKML;
+
+			return new Promise((resolve, reject) => {
+				fetchJsonp(query, {
+					jsonpCallback: 'callback',
+					timeout: 10000 // 10 seconds timeout
+				})
+					.then((response) => response.json())
+					.then((data) => {
+						if (Array.isArray(data) && data.length === 0) {
+							const errorMsg = 'No data found';
+							MeetingDataProcessor.displayError(errorMsg);
+							reject(new Error(errorMsg));
+						} else {
+							this.handleMeetingsData(data, isCSV, isKML);
+							resolve(data);
+						}
+					})
+					.catch((error) => {
+						MeetingDataProcessor.displayError(error.message || 'Error loading data');
+						reject(error);
+					});
 			});
 		}
 
-		private prepareForDataFetch(): void {
-			MeetingDataProcessor.clearError();
-			MeetingDataProcessor.hideLinks();
-		}
-
-		private setupJSONPCallback(
-			resolve: (value: any) => void,
-			reject: (reason?: any) => void
-		): string {
-			const callbackName = `jsonpCallback_${Date.now()}`;
-			const timeoutId = this.setupTimeout(callbackName, reject);
-
-			(window as any)[callbackName] = (data: any) => {
-				clearTimeout(timeoutId);
-				this.cleanupJSONP(callbackName);
-
-				if (Array.isArray(data) && data.length === 0) {
-					this.handleNoDataFound(reject);
-				} else {
-					this.handleMeetingsData(data, this.isProcessingCSV, this.isProcessingKML);
-					resolve(data);
-				}
-			};
-
-			return callbackName;
-		}
-
-		private setupTimeout(callbackName: string, reject: (reason?: any) => void): number {
-			return window.setTimeout(() => {
-				const errorMsg = 'Timeout: No response from server';
-				MeetingDataProcessor.displayError(errorMsg);
-				this.cleanupJSONP(callbackName);
-				reject(new Error(errorMsg));
-			}, 10000); // 10 seconds timeout
-		}
-
-		private cleanupJSONP(callbackName: string): void {
-			const script = document.querySelector(`script[src*="${callbackName}"]`);
-			if (script) document.body.removeChild(script);
-			delete window[callbackName as keyof Window];
-		}
-
-		private handleNoDataFound(reject: (reason?: any) => void): void {
-			const errorMsg = 'No data found';
-			MeetingDataProcessor.displayError(errorMsg);
-			reject(new Error(errorMsg));
-		}
-
-		private loadJSONPData(
-			query: string,
-			callbackName: string,
-			reject: (reason?: any) => void
-		): void {
-			const script = document.createElement('script');
-			script.src = `${query}&callback=${callbackName}`;
-			script.onerror = () => {
-				const errorMsg = 'Error loading data';
-				MeetingDataProcessor.displayError(errorMsg);
-				reject(new Error(errorMsg));
-			};
-			document.body.appendChild(script);
-		}
-
-		static displayError(message: string | null): void {
+		static displayError(message: string): void {
 			const errorContainer = document.getElementById('errorMessages');
 			if (errorContainer) {
 				errorContainer.textContent = message;
@@ -329,6 +287,13 @@
 			processor.exportData(query);
 		}
 	}
+
+	function handleKeyDown(event: KeyboardEvent): void {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			exportData();
+		}
+	}
 </script>
 
 <section class="section p-5">
@@ -336,7 +301,7 @@
 		<h1>BMLT Data Converter</h1>
 		<div id="inner-box">
 			<label for="query">BMLT URL Query:</label>
-			<input type="text" id="query" required />
+			<input type="text" id="query" required on:keydown={handleKeyDown} />
 			<button on:click={exportData}>Generate Export Data</button>
 			<a class="download-links" id="csvDownloadLink" download="BMLT_data.csv">Download CSV</a>
 			<a class="download-links" id="kmlDownloadLink" download="BMLT_data.kml">Download KML</a>
