@@ -62,6 +62,10 @@
 			clearInterval(interval);
 		}
 	});
+
+	$: if (query === '') {
+		errorMessage.set('');
+	}
 </script>
 
 <section>
