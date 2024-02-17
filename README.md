@@ -27,7 +27,7 @@ You can preview the production build with `npm run preview`.
 
 ## Deploying
 
-New deploys are down with every push to the main branch. You can deploy one manually by running:
+New deploys are done with every push to the main branch. You can deploy one manually by running:
 
 ```bash
 npm run deploy
