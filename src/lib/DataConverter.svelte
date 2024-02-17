@@ -34,6 +34,7 @@
 		}
 		processing.set(true);
 		errorMessage.set('');
+		loadingText.set('Processing');
 		csvDownloadUrl = '';
 		kmlDownloadUrl = '';
 		startLoadingAnimation();
@@ -81,11 +82,9 @@
 				on:keydown={(event) => event.key === 'Enter' && handleExport()}
 				placeholder="BMLT URL query..."
 			/>
-			<button on:click={handleExport} disabled={$processing}>Generate Export Data</button>
-			{#if $processing}
-				<div class="loading">{$loadingText}</div>
-			{/if}
-
+			<button on:click={handleExport} disabled={$processing}
+				>{$processing ? $loadingText : 'Generate Export Data'}</button
+			>
 			{#if $errorMessage}
 				<p class="error" id="errorMessages">{$errorMessage}</p>
 			{/if}
@@ -152,6 +151,7 @@
 		padding: 10px 20px;
 		margin-bottom: 15px;
 		border-radius: 3px;
+		height: 40px;
 		cursor: pointer;
 	}
 
@@ -200,12 +200,5 @@
 		border-radius: 3px;
 		box-sizing: border-box;
 		text-align: center;
-	}
-
-	.loading {
-		color: #007bff;
-		text-align: center;
-		padding: 10px;
-		font-weight: bold;
 	}
 </style>
