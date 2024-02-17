@@ -127,16 +127,7 @@ function prepareSimpleLine(meeting: Meeting, withDate = true): string {
 	};
 
 	const getDateString = () => {
-		const weekday_strings = [
-			'All',
-			'Sunday',
-			'Monday',
-			'Tuesday',
-			'Wednesday',
-			'Thursday',
-			'Friday',
-			'Saturday'
-		];
+		const weekday_strings = ['All', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 		const weekday = parseInt(meeting.weekday_tinyint?.trim() ?? '0');
 		const weekdayString = weekday_strings[weekday];
 

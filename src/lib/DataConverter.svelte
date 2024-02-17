@@ -76,22 +76,14 @@
 	<div id="export-form">
 		<h1>BMLT Data Converter</h1>
 		<div id="inner-box">
-			<input
-				type="text"
-				bind:value={query}
-				on:keydown={(event) => event.key === 'Enter' && handleExport()}
-				placeholder="BMLT URL query..."
-			/>
-			<button on:click={handleExport} disabled={$processing}
-				>{$processing ? $loadingText : 'Generate Export Data'}</button
-			>
+			<input type="text" bind:value={query} on:keydown={(event) => event.key === 'Enter' && handleExport()} placeholder="BMLT URL query..." />
+			<button on:click={handleExport} disabled={$processing}>{$processing ? $loadingText : 'Generate Export Data'}</button>
 			{#if $errorMessage}
 				<p class="error" id="errorMessages">{$errorMessage}</p>
 			{/if}
 
 			{#if csvDownloadUrl}
-				<a href={csvDownloadUrl} class="download-links" download="BMLT_data.csv">Download CSV</a><br
-				/>
+				<a href={csvDownloadUrl} class="download-links" download="BMLT_data.csv">Download CSV</a><br />
 			{/if}
 			{#if kmlDownloadUrl}
 				<a href={kmlDownloadUrl} class="download-links" download="BMLT_data.kml">Download KML</a>
@@ -99,11 +91,7 @@
 			<div id="description">Converts BMLT data from JSON to CSV or KML</div>
 		</div>
 		<div id="footer">
-			<a
-				href="https://github.com/bmlt-enabled/bmlt-data-converter/issues"
-				class="footer-link"
-				target="_blank">Issues?</a
-			>
+			<a href="https://github.com/bmlt-enabled/bmlt-data-converter/issues" class="footer-link" target="_blank">Issues?</a>
 		</div>
 	</div>
 </section>
