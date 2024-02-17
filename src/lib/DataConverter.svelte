@@ -29,6 +29,9 @@
 	}
 
 	async function handleExport() {
+		if (query.trim() === '') {
+			return;
+		}
 		processing.set(true);
 		errorMessage.set('');
 		csvDownloadUrl = '';
