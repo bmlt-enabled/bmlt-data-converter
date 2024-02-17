@@ -1,18 +1,39 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { fetchData, exportCSV, exportKML } from './DataUtils';
 
-	let query = '';
 	const processing = writable(false);
 	const errorMessage = writable('');
+	const loadingText = writable('');
+	let query = '';
 	let csvDownloadUrl = '';
 	let kmlDownloadUrl = '';
+	let interval: number | undefined;
+
+	function startLoadingAnimation() {
+		let dots = '';
+		interval = setInterval(() => {
+			if (dots.length < 4) {
+				dots += '.';
+			} else {
+				dots = '.';
+			}
+			loadingText.set(`Processing${dots}`);
+		}, 500); // 500 milliseconds
+	}
+
+	function stopLoadingAnimation() {
+		clearInterval(interval);
+		loadingText.set('');
+	}
 
 	async function handleExport() {
 		processing.set(true);
 		errorMessage.set('');
 		csvDownloadUrl = '';
 		kmlDownloadUrl = '';
+		startLoadingAnimation();
 
 		try {
 			const data = await fetchData(query);
@@ -32,8 +53,15 @@
 			}
 		} finally {
 			processing.set(false);
+			stopLoadingAnimation();
 		}
 	}
+
+	onDestroy(() => {
+		if (interval) {
+			clearInterval(interval);
+		}
+	});
 </script>
 
 <section>
@@ -47,6 +75,9 @@
 				placeholder="BMLT URL query..."
 			/>
 			<button on:click={handleExport} disabled={$processing}>Generate Export Data</button>
+			{#if $processing}
+				<div class="loading">{$loadingText}</div>
+			{/if}
 
 			{#if $errorMessage}
 				<p class="error" id="errorMessages">{$errorMessage}</p>
@@ -162,5 +193,12 @@
 		border-radius: 3px;
 		box-sizing: border-box;
 		text-align: center;
+	}
+
+	.loading {
+		color: #007bff;
+		text-align: center;
+		padding: 10px;
+		font-weight: bold;
 	}
 </style>
