@@ -50,8 +50,12 @@ export function exportCSV(data: any[]): string {
 		const values = Object.values(row).map((value) => {
 			if (typeof value === 'string') {
 				let stringValue = value.replace(/"/g, '""'); // Escape double quotes
+				if (stringValue.includes('#@-@#')) {
+					const busTrainSplit = stringValue.split('#@-@#');
+					stringValue = busTrainSplit[1];
+				}
 				if (stringValue.includes(',') || stringValue.includes('\n')) {
-					stringValue = `"${value}"`; // Quote fields containing commas or newlines
+					stringValue = `"${stringValue}"`; // Quote fields containing commas or newlines
 				}
 				return stringValue;
 			}
