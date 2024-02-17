@@ -1,5 +1,22 @@
 import fetchJsonp from 'fetch-jsonp';
 
+interface Meeting {
+	meeting_name: string;
+	longitude: string;
+	latitude: string;
+	weekday_tinyint: string;
+	start_time: string;
+	location_text: string;
+	location_street: string;
+	location_city_subsection: string;
+	location_municipality: string;
+	location_neighborhood: string;
+	location_province: string;
+	location_postal_code_1: string;
+	location_nation: string;
+	location_info: string;
+}
+
 export async function fetchData(query: string): Promise<any[]> {
 	try {
 		if (!query.includes('/client_interface/json')) {
@@ -49,21 +66,30 @@ export function exportCSV(data: any[]): string {
 	return URL.createObjectURL(blob);
 }
 
-export function exportKML(data: any[]): string {
-	let kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+export function exportKML(data: Meeting[]): string {
+	const placemarks = data.map(createPlacemark).filter(Boolean).join('\n');
+
+	const kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
-  <Document>`;
+  <Document>
+    ${placemarks}
+  </Document>
+</kml>`;
 
-	// Add place marks
-	data.forEach((meeting) => {
-		const name = meeting['meeting_name'].trim() || 'NA Meeting';
-		const lng = parseFloat(meeting['longitude']);
-		const lat = parseFloat(meeting['latitude']);
-		if (!lng || !lat) return '';
-		const description = prepareSimpleLine(meeting);
-		const address = prepareSimpleLine(meeting, false);
+	const blob = new Blob([kmlContent], { type: 'application/vnd.google-earth.kml+xml' });
+	return URL.createObjectURL(blob);
+}
 
-		kmlContent += `
+function createPlacemark(meeting: Meeting): string {
+	const name = meeting.meeting_name.trim() || 'NA Meeting';
+	const lng = parseFloat(meeting.longitude);
+	const lat = parseFloat(meeting.latitude);
+	if (!lng || !lat) return '';
+
+	const description = prepareSimpleLine(meeting);
+	const address = prepareSimpleLine(meeting, false);
+
+	return `
     <Placemark>
       <name>${name}</name>
       ${address ? `<address>${address}</address>` : ''}
@@ -72,27 +98,15 @@ export function exportKML(data: any[]): string {
         <coordinates>${lng},${lat}</coordinates>
       </Point>
     </Placemark>
-`;
-	});
-
-	kmlContent += `
-  </Document>
-</kml>`;
-
-	const blob = new Blob([kmlContent], { type: 'application/vnd.google-earth.kml+xml' });
-	return URL.createObjectURL(blob);
+  `.trim();
 }
 
-function prepareSimpleLine(meeting: { [x: string]: any }, withDate = true): string {
+function prepareSimpleLine(meeting: Meeting, withDate = true): string {
 	const getLocationInfo = () => {
-		const locationInfo: any[] = [];
-		const addInfo = (property: string) => {
-			if (property in meeting) {
-				const value = meeting[property].trim();
-				if (value) {
-					locationInfo.push(value);
-				}
-			}
+		const locationInfo: string[] = [];
+		const addInfo = (property: keyof Meeting) => {
+			const value = meeting[property]?.trim() ?? '';
+			if (value) locationInfo.push(value);
 		};
 
 		addInfo('location_text');
@@ -119,10 +133,10 @@ function prepareSimpleLine(meeting: { [x: string]: any }, withDate = true): stri
 			'Friday',
 			'Saturday'
 		];
-		const weekday = parseInt(meeting['weekday_tinyint'].trim());
+		const weekday = parseInt(meeting.weekday_tinyint?.trim() ?? '0');
 		const weekdayString = weekday_strings[weekday];
 
-		const startTime = `2000-01-01 ${meeting['start_time']}`;
+		const startTime = `2000-01-01 ${meeting.start_time}`;
 		const time = new Date(startTime);
 
 		if (weekdayString && withDate) {

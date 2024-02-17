@@ -2,7 +2,7 @@
 	import { writable } from 'svelte/store';
 	import { fetchData, exportCSV, exportKML } from './DataUtils';
 
-	let query = ''; // User input for data query
+	let query = '';
 	const processing = writable(false);
 	const errorMessage = writable('');
 	let csvDownloadUrl = '';
@@ -53,12 +53,11 @@
 			{/if}
 
 			{#if csvDownloadUrl}
-				<a href={csvDownloadUrl} class="download-links" download="exported_data.csv">Download CSV</a
-				><br />
+				<a href={csvDownloadUrl} class="download-links" download="BMLT_data.csv">Download CSV</a><br
+				/>
 			{/if}
 			{#if kmlDownloadUrl}
-				<a href={kmlDownloadUrl} class="download-links" download="exported_data.kml">Download KML</a
-				>
+				<a href={kmlDownloadUrl} class="download-links" download="BMLT_data.kml">Download KML</a>
 			{/if}
 			<div id="description">Converts BMLT data from JSON to CSV or KML</div>
 		</div>
