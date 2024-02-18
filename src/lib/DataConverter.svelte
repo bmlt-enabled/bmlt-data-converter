@@ -120,6 +120,11 @@
 		--text-color-dark: #333;
 	}
 
+	.download-links {
+		display: inline-block;
+		padding: 8px;
+	}
+
 	.error,
 	#errorMessages {
 		color: var(--error-color);
