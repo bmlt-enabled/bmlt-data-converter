@@ -1,4 +1,5 @@
 import fetchJsonp from 'fetch-jsonp';
+import * as XLSX from 'xlsx';
 
 interface Meeting {
 	meeting_name: string;
@@ -67,6 +68,38 @@ export function exportCSV(data: any[]): string {
 
 	const csvString = csvRows.join('\n');
 	const blob = new Blob([csvString], { type: 'text/csv' });
+	return URL.createObjectURL(blob);
+}
+
+export function exportXLS(data: any[]): string {
+	if (!Array.isArray(data) || data.length === 0) {
+		throw new Error('No data found');
+	}
+
+	const processedData = data.map((row) =>
+		Object.keys(row).reduce((acc, key) => {
+			let value: string | number = row[key];
+			if (typeof value === 'string' && value.includes('#@-@#')) {
+				[, value] = value.split('#@-@#');
+			}
+			acc[key] = value;
+			return acc;
+		}, {} as any)
+	);
+
+	const wb = XLSX.utils.book_new();
+	const ws = XLSX.utils.json_to_sheet(processedData);
+	XLSX.utils.book_append_sheet(wb, ws, 'Data');
+	const wbout = XLSX.write(wb, { bookType: 'xls', type: 'binary' });
+
+	function s2ab(s: string): ArrayBuffer {
+		const buf = new ArrayBuffer(s.length);
+		const view = new Uint8Array(buf);
+		for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+		return buf;
+	}
+
+	const blob = new Blob([s2ab(wbout)], { type: 'application/vnd.ms-excel' });
 	return URL.createObjectURL(blob);
 }
 

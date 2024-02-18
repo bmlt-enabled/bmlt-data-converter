@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { fetchData, exportCSV, exportKML } from './DataUtils';
+	import { fetchData, exportCSV, exportXLS, exportKML } from './DataUtils';
 
 	const processing = writable<boolean>(false);
 	const errorMessage = writable<string>('');
 	const loadingText = writable<string>('');
 	let query: string = '';
 	let csvDownloadUrl: string = '';
+	let xlsDownloadUrl: string = '';
 	let kmlDownloadUrl: string = '';
 	let interval: number | undefined;
 
@@ -38,6 +39,7 @@
 		errorMessage.set('');
 		loadingText.set('Processing');
 		csvDownloadUrl = '';
+		xlsDownloadUrl = '';
 		kmlDownloadUrl = '';
 		startLoadingAnimation();
 
@@ -46,6 +48,8 @@
 			if (data && data.length > 0) {
 				// Process data for CSV
 				csvDownloadUrl = exportCSV(data);
+				// Process data for XLS
+				xlsDownloadUrl = exportXLS(data);
 				// Process data for KML
 				kmlDownloadUrl = query.includes('GetSearchResults') ? exportKML(data) : '';
 			} else {
@@ -87,10 +91,13 @@
 			{#if csvDownloadUrl}
 				<a href={csvDownloadUrl} class="download-links" download="BMLT_data.csv">Download CSV</a><br />
 			{/if}
+			{#if xlsDownloadUrl}
+				<a href={xlsDownloadUrl} class="download-links" download="BMLT_data.xls">Download XLS</a><br />
+			{/if}
 			{#if kmlDownloadUrl}
 				<a href={kmlDownloadUrl} class="download-links" download="BMLT_data.kml">Download KML</a>
 			{/if}
-			<div id="description">Converts BMLT data from JSON to CSV or KML</div>
+			<div id="description">Converts BMLT data from JSON to CSV, XLS or KML</div>
 		</div>
 		<div id="footer">
 			<a href="https://github.com/bmlt-enabled/bmlt-data-converter/issues" class="footer-link" target="_blank">Issues?</a>
