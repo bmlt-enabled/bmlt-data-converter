@@ -46,27 +46,11 @@ export function exportCSV(data: any[]): string {
 	if (!Array.isArray(data) || data.length === 0) {
 		throw new Error('No data found');
 	}
-	const header = Object.keys(data[0]).join(',');
-	const csvRows = data.map((row) => {
-		const values = Object.values(row).map((value) => {
-			if (typeof value === 'string') {
-				let stringValue = value.replace(/"/g, '""'); // Escape double quotes
-				if (stringValue.includes('#@-@#')) {
-					const busTrainSplit = stringValue.split('#@-@#');
-					stringValue = busTrainSplit[1];
-				}
-				if (stringValue.includes(',') || stringValue.includes('\n')) {
-					stringValue = `"${stringValue}"`; // Quote fields containing commas or newlines
-				}
-				return stringValue;
-			}
-			return String(value);
-		});
-		return values.join(',');
-	});
-	csvRows.unshift(header); // Add header row at the beginning
-
-	const csvString = csvRows.join('\n');
+	const processedData = processExportData(data);
+	const wb = XLSX.utils.book_new();
+	const ws = XLSX.utils.json_to_sheet(processedData);
+	XLSX.utils.book_append_sheet(wb, ws, 'Data');
+	const csvString = XLSX.write(wb, { bookType: 'csv', type: 'string' });
 	const blob = new Blob([csvString], { type: 'text/csv' });
 	return URL.createObjectURL(blob);
 }
@@ -75,30 +59,17 @@ export function exportXLS(data: any[]): string {
 	if (!Array.isArray(data) || data.length === 0) {
 		throw new Error('No data found');
 	}
-
-	const processedData = data.map((row) =>
-		Object.keys(row).reduce((acc, key) => {
-			let value: string | number = row[key];
-			if (typeof value === 'string' && value.includes('#@-@#')) {
-				[, value] = value.split('#@-@#');
-			}
-			acc[key] = value;
-			return acc;
-		}, {} as any)
-	);
-
+	const processedData = processExportData(data);
 	const wb = XLSX.utils.book_new();
 	const ws = XLSX.utils.json_to_sheet(processedData);
 	XLSX.utils.book_append_sheet(wb, ws, 'Data');
 	const wbout = XLSX.write(wb, { bookType: 'xls', type: 'binary' });
-
 	function s2ab(s: string): ArrayBuffer {
 		const buf = new ArrayBuffer(s.length);
 		const view = new Uint8Array(buf);
 		for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
 		return buf;
 	}
-
 	const blob = new Blob([s2ab(wbout)], { type: 'application/vnd.ms-excel' });
 	return URL.createObjectURL(blob);
 }
@@ -115,6 +86,20 @@ export function exportKML(data: Meeting[]): string {
 
 	const blob = new Blob([kmlContent], { type: 'application/vnd.google-earth.kml+xml' });
 	return URL.createObjectURL(blob);
+}
+
+// This is for Bus/Train/Custom fields
+function processExportData(data: any[]): any[] {
+	return data.map((row) =>
+		Object.keys(row).reduce((acc, key) => {
+			let value: string | number = row[key];
+			if (typeof value === 'string' && value.includes('#@-@#')) {
+				[, value] = value.split('#@-@#');
+			}
+			acc[key] = value;
+			return acc;
+		}, {} as any)
+	);
 }
 
 function createPlacemark(meeting: Meeting): string {
