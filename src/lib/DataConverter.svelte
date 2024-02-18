@@ -1,35 +1,13 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { fetchData, exportCSV, exportXLSX, exportKML } from './DataUtils';
 
 	const processing = writable<boolean>(false);
 	const errorMessage = writable<string>('');
-	const loadingText = writable<string>('');
 	let query: string = '';
 	let csvDownloadUrl: string = '';
 	let xlsxDownloadUrl: string = '';
 	let kmlDownloadUrl: string = '';
-	let interval: number | undefined;
-
-	function startLoadingAnimation() {
-		let dots: string = '';
-		interval = setInterval(() => {
-			if (dots.length < 4) {
-				dots += '.';
-			} else {
-				dots = '.';
-			}
-			loadingText.set(`Processing${dots}`);
-		}, 500); // 500 milliseconds
-	}
-
-	function stopLoadingAnimation() {
-		if (interval !== undefined) {
-			clearInterval(interval);
-		}
-		loadingText.set('');
-	}
 
 	async function handleExport() {
 		if (query.trim() === '') {
@@ -37,11 +15,9 @@
 		}
 		processing.set(true);
 		errorMessage.set('');
-		loadingText.set('Processing');
 		csvDownloadUrl = '';
 		xlsxDownloadUrl = '';
 		kmlDownloadUrl = '';
-		startLoadingAnimation();
 
 		try {
 			const data = await fetchData(query);
@@ -63,15 +39,8 @@
 			}
 		} finally {
 			processing.set(false);
-			stopLoadingAnimation();
 		}
 	}
-
-	onDestroy(() => {
-		if (interval) {
-			clearInterval(interval);
-		}
-	});
 
 	$: if (query === '') {
 		errorMessage.set('');
@@ -83,7 +52,7 @@
 		<h1>BMLT Data Converter</h1>
 		<div id="inner-box">
 			<input type="text" bind:value={query} on:keydown={(event) => event.key === 'Enter' && handleExport()} placeholder="BMLT URL query..." />
-			<button on:click={handleExport} disabled={$processing}>{$processing ? $loadingText : 'Generate Export Data'}</button>
+			<button on:click={handleExport} disabled={$processing} class={$processing ? 'generateButtonProcessing' : 'generateButton'}></button>
 			{#if $errorMessage}
 				<p class="error" id="errorMessages">{$errorMessage}</p>
 			{/if}
@@ -118,6 +87,32 @@
 		--background-dark: #e0d8d8;
 		--background-white: #fff;
 		--text-color-dark: #333;
+	}
+
+	@keyframes dots {
+		0%,
+		20% {
+			content: 'Processing.';
+		}
+		40% {
+			content: 'Processing..';
+		}
+		60% {
+			content: 'Processing...';
+		}
+		80%,
+		100% {
+			content: 'Processing....';
+		}
+	}
+
+	.generateButtonProcessing::after {
+		content: '';
+		animation: dots 1.5s infinite;
+	}
+
+	.generateButton::before {
+		content: 'Generate Export Data';
 	}
 
 	.download-links {
