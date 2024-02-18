@@ -3,16 +3,16 @@
 	import { writable } from 'svelte/store';
 	import { fetchData, exportCSV, exportKML } from './DataUtils';
 
-	const processing = writable(false);
-	const errorMessage = writable('');
-	const loadingText = writable('');
-	let query = '';
-	let csvDownloadUrl = '';
-	let kmlDownloadUrl = '';
+	const processing = writable<boolean>(false);
+	const errorMessage = writable<string>('');
+	const loadingText = writable<string>('');
+	let query: string = '';
+	let csvDownloadUrl: string = '';
+	let kmlDownloadUrl: string = '';
 	let interval: number | undefined;
 
 	function startLoadingAnimation() {
-		let dots = '';
+		let dots: string = '';
 		interval = setInterval(() => {
 			if (dots.length < 4) {
 				dots += '.';
@@ -24,7 +24,9 @@
 	}
 
 	function stopLoadingAnimation() {
-		clearInterval(interval);
+		if (interval !== undefined) {
+			clearInterval(interval);
+		}
 		loadingText.set('');
 	}
 
@@ -97,96 +99,113 @@
 </section>
 
 <style>
-	.error {
-		color: red;
+	:root {
+		--error-color: red;
+		--button-bg-color: #007bff;
+		--button-hover-bg-color: #0056b3;
+		--border-color: #ccc;
+		--border-radius: 3px;
+		--font-family-default: Arial, sans-serif;
+		--link-color: #007bff;
+		--background-light: #f7f7f7;
+		--background-dark: #e0d8d8;
+		--background-white: #fff;
+		--text-color-dark: #333;
 	}
 
-	h1 {
+	.error,
+	#errorMessages {
+		color: var(--error-color);
+	}
+
+	#errorMessages,
+	#description,
+	h1,
+	.download-links,
+	.footer-link,
+	#footer,
+	#inner-box {
 		text-align: center;
+	}
+
+	#export-form,
+	input[type='text'],
+	button,
+	#inner-box,
+	#footer {
+		border-radius: var(--border-radius);
+		box-sizing: border-box;
+	}
+
+	#export-form,
+	#inner-box {
+		border: 1px solid var(--border-color);
+	}
+
+	#inner-box {
+		padding: 20px;
+		margin-bottom: 20px;
+		background-color: var(--background-white);
 	}
 
 	#export-form {
-		font-family: Arial, sans-serif;
+		font-family: var(--font-family-default);
+		background-color: var(--background-light);
 		max-width: 800px;
 		margin: 20px auto 0;
 		padding: 1px 20px 20px;
-		background-color: #f7f7f7;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-		box-sizing: border-box;
 	}
 
-	#errorMessages {
-		color: red;
-		text-align: center;
-		padding-top: 15px;
-	}
-
-	input[type='text'] {
+	input[type='text'],
+	button {
 		width: 100%;
 		padding: 10px;
 		margin-bottom: 10px;
-		border: 1px solid #ccc;
-		border-radius: 3px;
-		box-sizing: border-box;
+	}
+
+	input[type='text'] {
+		border: 1px solid var(--border-color);
 	}
 
 	button {
-		background-color: #007bff;
-		width: 100%;
+		background-color: var(--button-bg-color);
 		color: #fff;
 		border: none;
 		padding: 10px 20px;
 		margin-bottom: 15px;
-		border-radius: 3px;
 		height: 40px;
 		cursor: pointer;
+		transition: background-color 0.3s; /* Smooth transition for hover effect */
 	}
 
 	button:hover {
-		background-color: #0056b3;
+		background-color: var(--button-hover-bg-color);
 	}
 
-	.download-links {
-		text-align: center;
-		text-decoration: none;
-		color: #007bff;
+	.download-links,
+	.footer-link,
+	a:hover {
+		color: var(--link-color);
 	}
 
+	.download-links,
 	.footer-link {
-		display: block;
-		text-align: center;
 		text-decoration: none;
-		color: #007bff;
 	}
 
 	a:hover {
 		text-decoration: underline;
 	}
 
-	#inner-box {
-		padding: 20px;
-		background-color: #fff;
-		border: 1px solid #ddd;
-		border-radius: 3px;
-		box-sizing: border-box;
-		text-align: center;
-		margin-bottom: 20px;
+	#footer {
+		padding: 10px;
+		background-color: var(--background-dark);
+		border: 1px solid var(--background-dark);
 	}
 
 	#description {
-		text-align: center;
 		margin-top: 20px;
 		font-size: 1em;
-		color: #333;
-	}
-
-	#footer {
-		padding: 10px;
-		background-color: #e0d8d8;
-		border: 1px solid #e0d8d8;
-		border-radius: 3px;
-		box-sizing: border-box;
-		text-align: center;
+		color: var(--text-color-dark);
 	}
 </style>
