@@ -10,33 +10,18 @@
 	let kmlDownloadUrl: string = '';
 
 	async function handleExport() {
-		if (query.trim() === '') {
-			return;
-		}
-		processing.set(true);
-		errorMessage.set('');
-		csvDownloadUrl = '';
-		xlsxDownloadUrl = '';
-		kmlDownloadUrl = '';
-
+		if (query.trim() === '') return;
 		try {
+			processing.set(true);
 			const data = await fetchData(query);
-			if (data && data.length > 0) {
-				// Process data for CSV
-				csvDownloadUrl = exportCSV(data);
-				// Process data for XLSX
-				xlsxDownloadUrl = exportXLSX(data);
-				// Process data for KML
-				kmlDownloadUrl = query.includes('GetSearchResults') ? exportKML(data) : '';
-			} else {
-				throw new Error('No data available for export.');
-			}
+			// Process data for CSV
+			csvDownloadUrl = exportCSV(data);
+			// Process data for XLSX
+			xlsxDownloadUrl = exportXLSX(data);
+			// Process data for KML
+			kmlDownloadUrl = query.includes('GetSearchResults') ? exportKML(data) : '';
 		} catch (error) {
-			if (error instanceof Error) {
-				errorMessage.set(error.message || 'Failed to export data.');
-			} else {
-				errorMessage.set('Failed to export data.');
-			}
+			errorMessage.set(error instanceof Error ? error.message : 'Failed to export data.');
 		} finally {
 			processing.set(false);
 		}
