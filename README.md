@@ -1,6 +1,6 @@
 # BMLT Data Converter
 
-- Converts BMLT data from JSON to CSV, XLS or KML
+- Converts BMLT data from JSON to CSV, XLSX or KML
   - Note that export of KML is only supported with GetSearchResults.
 - Use your semantic interface to build query url
 
