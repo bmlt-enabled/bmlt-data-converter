@@ -55,7 +55,7 @@ export function exportCSV(data: any[]): string {
 	return URL.createObjectURL(blob);
 }
 
-export function exportXLS(data: any[]): string {
+export function exportXLSX(data: any[]): string {
 	if (!Array.isArray(data) || data.length === 0) {
 		throw new Error('No data found');
 	}
@@ -63,14 +63,14 @@ export function exportXLS(data: any[]): string {
 	const wb = XLSX.utils.book_new();
 	const ws = XLSX.utils.json_to_sheet(processedData);
 	XLSX.utils.book_append_sheet(wb, ws, 'Data');
-	const wbout = XLSX.write(wb, { bookType: 'xls', type: 'binary' });
+	const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 	function s2ab(s: string): ArrayBuffer {
 		const buf = new ArrayBuffer(s.length);
 		const view = new Uint8Array(buf);
 		for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
 		return buf;
 	}
-	const blob = new Blob([s2ab(wbout)], { type: 'application/vnd.ms-excel' });
+	const blob = new Blob([s2ab(wbout)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 	return URL.createObjectURL(blob);
 }
 
