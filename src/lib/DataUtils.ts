@@ -34,18 +34,11 @@ export async function fetchData(query: string): Promise<any[]> {
 		}
 		return data;
 	} catch (error) {
-		if (error instanceof Error) {
-			throw new Error(error.message || 'Error loading data');
-		} else {
-			throw new Error('Error loading data');
-		}
+		throw new Error(error instanceof Error ? error.message : 'Error loading data');
 	}
 }
 
 export function exportCSV(data: any[]): string {
-	if (!Array.isArray(data) || data.length === 0) {
-		throw new Error('No data found');
-	}
 	const processedData = processExportData(data);
 	const wb = XLSX.utils.book_new();
 	const ws = XLSX.utils.json_to_sheet(processedData);
@@ -56,9 +49,6 @@ export function exportCSV(data: any[]): string {
 }
 
 export function exportXLSX(data: any[]): string {
-	if (!Array.isArray(data) || data.length === 0) {
-		throw new Error('No data found');
-	}
 	const processedData = processExportData(data);
 	const wb = XLSX.utils.book_new();
 	const ws = XLSX.utils.json_to_sheet(processedData);
