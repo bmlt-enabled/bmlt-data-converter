@@ -7,6 +7,7 @@ interface Meeting {
 	latitude: string;
 	weekday_tinyint: string;
 	start_time: string;
+	lang_enum: string;
 	location_text: string;
 	location_street: string;
 	location_city_subsection: string;
@@ -130,18 +131,20 @@ function prepareSimpleLine(meeting: Meeting, withDate: boolean = true): string {
 	};
 
 	const getDateString = () => {
-		const weekday_strings = ['All', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-		const weekday = parseInt(meeting.weekday_tinyint?.trim() ?? '0');
-		const weekdayString = weekday_strings[weekday];
-		const startTime = `2000-01-01 ${meeting.start_time}`;
-		const time = new Date(startTime);
-		if (weekdayString && withDate) {
-			let dateString = weekdayString;
-			if (!isNaN(time.getTime())) {
-				dateString += `, ${time.toLocaleTimeString('en-US', {
+		const dayOfWeekInt = parseInt(meeting.weekday_tinyint?.trim() ?? '0');
+		const adjustedDay = dayOfWeekInt % 7;
+		// January 1, 2023, was a Sunday.
+		const baseDate = new Date('2023-01-01');
+		baseDate.setDate(baseDate.getDate() + adjustedDay);
+		const lang = meeting.lang_enum === 'dk' ? 'da' : meeting.lang_enum;
+		const twelveHrLangs: string[] = ['en', 'es'];
+		if (dayOfWeekInt && withDate) {
+			let dateString = baseDate.toLocaleDateString(lang, { weekday: 'long' });
+			if (!isNaN(baseDate.getTime())) {
+				dateString += `, ${baseDate.toLocaleTimeString(lang, {
 					hour: 'numeric',
 					minute: 'numeric',
-					hour12: true
+					hour12: twelveHrLangs.includes(lang)
 				})}`;
 			}
 			return dateString;
