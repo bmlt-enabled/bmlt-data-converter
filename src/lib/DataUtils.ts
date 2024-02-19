@@ -21,7 +21,7 @@ interface Meeting {
 export async function fetchData(query: string): Promise<any[]> {
 	try {
 		if (!query.includes('/client_interface/json')) {
-			throw new Error('Query does not contain a valid json endpoint.');
+			return Promise.reject(new Error('Query does not contain a valid json endpoint.'));
 		}
 		const updatedQuery = query.replace('/client_interface/json/', '/client_interface/jsonp/');
 		const response = await fetchJsonp(updatedQuery, {
@@ -30,7 +30,7 @@ export async function fetchData(query: string): Promise<any[]> {
 		});
 		const data = await response.json();
 		if (!Array.isArray(data) || data.length === 0) {
-			throw new Error('No data found');
+			return Promise.reject(new Error('No data found'));
 		}
 		return data;
 	} catch (error) {
@@ -110,7 +110,7 @@ function createPlacemark(meeting: Meeting): string {
   `.trim();
 }
 
-function prepareSimpleLine(meeting: Meeting, withDate = true): string {
+function prepareSimpleLine(meeting: Meeting, withDate: boolean = true): string {
 	const getLocationInfo = () => {
 		const locationInfo: string[] = [];
 		const addInfo = (property: keyof Meeting) => {
