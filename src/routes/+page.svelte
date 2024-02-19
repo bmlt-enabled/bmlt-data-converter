@@ -1,6 +1,6 @@
 <script>
 	import DataConverter from '$lib/DataConverter.svelte';
-	import './main.scss';
+	import '../css/main.scss';
 </script>
 
 <svelte:head>

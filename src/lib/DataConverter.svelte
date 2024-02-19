@@ -11,6 +11,11 @@
 
 	async function handleExport() {
 		if (query.trim() === '') return;
+		errorMessage.set('');
+		csvDownloadUrl = '';
+		xlsxDownloadUrl = '';
+		kmlDownloadUrl = '';
+
 		try {
 			processing.set(true);
 			const data = await fetchData(query);

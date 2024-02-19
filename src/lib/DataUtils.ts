@@ -54,12 +54,6 @@ export function exportXLSX(data: any[]): string {
 	const ws = XLSX.utils.json_to_sheet(processedData);
 	XLSX.utils.book_append_sheet(wb, ws, 'Data');
 	const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-	function s2ab(s: string): ArrayBuffer {
-		const buf = new ArrayBuffer(s.length);
-		const view = new Uint8Array(buf);
-		for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
-		return buf;
-	}
 	const blob = new Blob([s2ab(wbout)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 	return URL.createObjectURL(blob);
 }
@@ -74,6 +68,13 @@ export function exportKML(data: Meeting[]): string {
 </kml>`;
 	const blob = new Blob([kmlContent], { type: 'application/vnd.google-earth.kml+xml' });
 	return URL.createObjectURL(blob);
+}
+
+function s2ab(s: string): ArrayBuffer {
+	const buf = new ArrayBuffer(s.length);
+	const view = new Uint8Array(buf);
+	for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+	return buf;
 }
 
 // This is for Bus/Train/Custom fields
