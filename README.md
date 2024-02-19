@@ -4,6 +4,10 @@
   - Note that export of KML is only supported with GetSearchResults.
 - Use your semantic interface to build query url
 
+---
+
+Bootstrapped using [SvelteKit](https://kit.svelte.dev/). Powered by [Svelte](https://svelte.dev/) and [Vite](https://vitejs.dev/)
+
 ## Developing
 
 Once you've installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
