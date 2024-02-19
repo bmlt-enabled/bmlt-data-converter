@@ -14,11 +14,8 @@
 		try {
 			processing.set(true);
 			const data = await fetchData(query);
-			// Process data for CSV
 			csvDownloadUrl = exportCSV(data);
-			// Process data for XLSX
 			xlsxDownloadUrl = exportXLSX(data);
-			// Process data for KML
 			kmlDownloadUrl = query.includes('GetSearchResults') ? exportKML(data) : '';
 		} catch (error) {
 			errorMessage.set(error instanceof Error ? error.message : 'Failed to export data.');
@@ -41,7 +38,6 @@
 			{#if $errorMessage}
 				<p class="error" id="errorMessages">{$errorMessage}</p>
 			{/if}
-
 			{#if csvDownloadUrl}
 				<a href={csvDownloadUrl} class="download-links" download="BMLT_data.csv">Download CSV</a><br />
 			{/if}
@@ -167,7 +163,7 @@
 		margin-bottom: 15px;
 		height: 40px;
 		cursor: pointer;
-		transition: background-color 0.3s; /* Smooth transition for hover effect */
+		transition: background-color 0.3s;
 	}
 
 	button:hover {

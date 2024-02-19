@@ -66,14 +66,12 @@ export function exportXLSX(data: any[]): string {
 
 export function exportKML(data: Meeting[]): string {
 	const placemarks = data.map(createPlacemark).filter(Boolean).join('\n');
-
 	const kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     ${placemarks}
   </Document>
 </kml>`;
-
 	const blob = new Blob([kmlContent], { type: 'application/vnd.google-earth.kml+xml' });
 	return URL.createObjectURL(blob);
 }
@@ -97,10 +95,8 @@ function createPlacemark(meeting: Meeting): string {
 	const lng = parseFloat(meeting.longitude);
 	const lat = parseFloat(meeting.latitude);
 	if (!lng || !lat) return '';
-
 	const description = prepareSimpleLine(meeting);
 	const address = prepareSimpleLine(meeting, false);
-
 	return `
     <Placemark>
       <name>${name}</name>
@@ -120,7 +116,6 @@ function prepareSimpleLine(meeting: Meeting, withDate = true): string {
 			const value = meeting[property]?.trim() ?? '';
 			if (value) locationInfo.push(value);
 		};
-
 		addInfo('location_text');
 		addInfo('location_street');
 		addInfo('location_city_subsection');
@@ -130,7 +125,6 @@ function prepareSimpleLine(meeting: Meeting, withDate = true): string {
 		addInfo('location_postal_code_1');
 		addInfo('location_nation');
 		addInfo('location_info');
-
 		return locationInfo.join(', ');
 	};
 
@@ -138,13 +132,10 @@ function prepareSimpleLine(meeting: Meeting, withDate = true): string {
 		const weekday_strings = ['All', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 		const weekday = parseInt(meeting.weekday_tinyint?.trim() ?? '0');
 		const weekdayString = weekday_strings[weekday];
-
 		const startTime = `2000-01-01 ${meeting.start_time}`;
 		const time = new Date(startTime);
-
 		if (weekdayString && withDate) {
 			let dateString = weekdayString;
-
 			if (!isNaN(time.getTime())) {
 				dateString += `, ${time.toLocaleTimeString('en-US', {
 					hour: 'numeric',
@@ -152,16 +143,12 @@ function prepareSimpleLine(meeting: Meeting, withDate = true): string {
 					hour12: true
 				})}`;
 			}
-
 			return dateString;
 		}
-
 		return '';
 	};
-
 	const locationInfo = getLocationInfo();
 	const dateString = getDateString();
-
 	if (withDate && dateString && locationInfo) {
 		return `${dateString}, ${locationInfo}`;
 	} else if (dateString) {
