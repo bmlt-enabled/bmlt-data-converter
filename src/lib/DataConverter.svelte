@@ -29,7 +29,7 @@
 		}
 	}
 
-	$: if (query === '') {
+	$: if (query.trim() === '') {
 		errorMessage.set('');
 	}
 </script>

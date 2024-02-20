@@ -2,7 +2,8 @@
 
 - Converts BMLT data from JSON to CSV, XLSX or KML
   - Note that export of KML is only supported with GetSearchResults.
-- Use your semantic interface to build query url
+- Use your semantic interface to build query url. You can find your semantic url by visiting the
+  [tally](https://tally.bmlt.app/) and hitting Explore on your root server.
 
 ---
 
