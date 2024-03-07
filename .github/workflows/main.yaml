@@ -1,4 +1,4 @@
-name: test
+name: test / lint
 on:
   push:
     branches-ignore: ['main']
