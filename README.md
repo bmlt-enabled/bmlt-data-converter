@@ -1,6 +1,6 @@
 # BMLT Data Converter
 
-- Converts BMLT data from JSON to CSV, XLSX or KML
+- Converts BMLT data from JSON to CSV, XLSX KML, or YAML
   - Note that export of KML is only supported with GetSearchResults.
 - Use your semantic interface to build query url. You can find your semantic url by visiting the
   [tally](https://tally.bmlt.app/) and hitting Explore on your root server.

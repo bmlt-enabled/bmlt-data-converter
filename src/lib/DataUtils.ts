@@ -1,5 +1,6 @@
 import fetchJsonp from 'fetch-jsonp';
 import * as XLSX from 'xlsx';
+import * as yaml from 'js-yaml';
 
 interface Meeting {
 	meeting_name: string;
@@ -46,6 +47,13 @@ export function exportCSV(data: any[]): string {
 	XLSX.utils.book_append_sheet(wb, ws, 'Data');
 	const csvString = XLSX.write(wb, { bookType: 'csv', type: 'string' });
 	const blob = new Blob([csvString], { type: 'text/csv' });
+	return URL.createObjectURL(blob);
+}
+
+export function exportYAML(data: any[]): string {
+	const processedData = processExportData(data);
+	const yamlString = yaml.dump(processedData);
+	const blob = new Blob([yamlString], { type: 'application/x-yaml' });
 	return URL.createObjectURL(blob);
 }
 
