@@ -1,5 +1,6 @@
 import fetchJsonp from 'fetch-jsonp';
 import * as XLSX from 'xlsx';
+import * as js2xmlparser from 'js2xmlparser';
 import * as yaml from 'js-yaml';
 
 interface Meeting {
@@ -54,6 +55,13 @@ export function exportYAML(data: any[]): string {
 	const processedData = processExportData(data);
 	const yamlString = yaml.dump(processedData);
 	const blob = new Blob([yamlString], { type: 'application/x-yaml' });
+	return URL.createObjectURL(blob);
+}
+
+export function exportXML(data: any[]): string {
+	const processedData = processExportData(data);
+	const xmlResult = js2xmlparser.parse('root', processedData);
+	const blob = new Blob([xmlResult], { type: 'text/xml' });
 	return URL.createObjectURL(blob);
 }
 

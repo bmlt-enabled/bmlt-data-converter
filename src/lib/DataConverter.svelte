@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
-	import { fetchData, exportCSV, exportXLSX, exportKML, exportYAML } from './DataUtils';
+	import { fetchData, exportCSV, exportXLSX, exportXML, exportKML, exportYAML } from './DataUtils';
 
 	const processing = writable<boolean>(false);
 	const errorMessage = writable<string>('');
 	let query: string = '';
 	let csvDownloadUrl: string = '';
 	let xlsxDownloadUrl: string = '';
+	let xmlDownloadUrl: string = '';
 	let kmlDownloadUrl: string = '';
 	let yamlDownloadUrl: string = '';
 
@@ -15,6 +16,7 @@
 		errorMessage.set('');
 		csvDownloadUrl = '';
 		xlsxDownloadUrl = '';
+		xmlDownloadUrl = '';
 		kmlDownloadUrl = '';
 		yamlDownloadUrl = '';
 
@@ -23,6 +25,7 @@
 			const data = await fetchData(query);
 			csvDownloadUrl = exportCSV(data);
 			xlsxDownloadUrl = exportXLSX(data);
+			xmlDownloadUrl = exportXML(data);
 			yamlDownloadUrl = exportYAML(data);
 			kmlDownloadUrl = query.includes('GetSearchResults') ? exportKML(data) : '';
 		} catch (error) {
@@ -52,13 +55,16 @@
 			{#if xlsxDownloadUrl}
 				<a href={xlsxDownloadUrl} class="download-links" download="BMLT_data.xlsx">Download XLSX</a><br />
 			{/if}
+			{#if xmlDownloadUrl}
+				<a href={xmlDownloadUrl} class="download-links" download="BMLT_data.xml">Download XML</a><br />
+			{/if}
 			{#if kmlDownloadUrl}
 				<a href={kmlDownloadUrl} class="download-links" download="BMLT_data.kml">Download KML</a><br />
 			{/if}
 			{#if yamlDownloadUrl}
 				<a href={yamlDownloadUrl} class="download-links" download="BMLT_data.yaml">Download YAML</a>
 			{/if}
-			<div id="description">Converts BMLT data from JSON to CSV, XLSX, KML or YAML</div>
+			<div id="description">Converts BMLT data from JSON to CSV, XLSX, XML, KML or YAML</div>
 		</div>
 		<div id="footer">
 			<a href="https://github.com/bmlt-enabled/bmlt-data-converter/issues" class="footer-link" target="_blank">Issues?</a>
