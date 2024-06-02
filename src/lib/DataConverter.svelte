@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import { fetchData, exportCSV, exportXLSX, exportXML, exportKML, exportYAML } from './DataUtils';
+	import { theme } from '../stores/themeStore';
+	import ThemeSwitcher from '../components/ThemeSwitcher.svelte';
+
+	if (typeof window !== 'undefined') {
+		const savedTheme = window.localStorage.getItem('theme');
+		if (savedTheme) {
+			theme.set(savedTheme);
+		}
+	}
 
 	const processing = writable<boolean>(false);
 	const errorMessage = writable<string>('');
@@ -40,12 +49,12 @@
 	}
 </script>
 
-<section>
+<section class={$theme}>
 	<div id="export-form">
 		<h1>BMLT Data Converter</h1>
 		<div id="inner-box">
 			<input type="text" bind:value={query} on:keydown={(event) => event.key === 'Enter' && handleExport()} placeholder="BMLT URL query..." />
-			<button on:click={handleExport} disabled={$processing} class={$processing ? 'generateButtonProcessing' : 'generateButton'}></button>
+			<button disabled={$processing} on:click={handleExport} class={$processing ? 'button is-fullwidth generateButtonProcessing' : 'button is-fullwidth generateButton'}></button>
 			{#if $errorMessage}
 				<p class="error" id="errorMessages">{$errorMessage}</p>
 			{/if}
@@ -69,8 +78,6 @@
 		<div id="footer">
 			<a href="https://github.com/bmlt-enabled/bmlt-data-converter/issues" class="footer-link" target="_blank">Issues?</a>
 		</div>
+		<ThemeSwitcher />
 	</div>
 </section>
-
-<style>
-</style>
