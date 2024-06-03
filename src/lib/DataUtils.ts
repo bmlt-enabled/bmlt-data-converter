@@ -152,7 +152,7 @@ function prepareSimpleLine(meeting: Meeting, withDate: boolean = true): string {
 		// January 1, 2023, was a Sunday.
 		const baseDate = new Date('2023-01-01');
 		baseDate.setDate(baseDate.getDate() + adjustedDay);
-		const lang = meeting.lang_enum === 'dk' ? 'da' : meeting.lang_enum;
+		const lang = meeting.lang_enum ? (meeting.lang_enum === 'dk' ? 'da' : meeting.lang_enum) : window.navigator.language;
 		const twelveHrLangs: string[] = ['en', 'es'];
 		if (dayOfWeekInt && withDate) {
 			let dateString = baseDate.toLocaleDateString(lang, { weekday: 'long' });
