@@ -1,34 +1,27 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
-	import { fetchData, exportCSV, exportXLSX, exportXML, exportKML, exportYAML } from '$lib/DataUtils';
-	import DownloadLinks from './DownloadLinks.svelte';
+	import { fetchData } from '../utils/DataUtils';
+	import ExportCSV from './ExportCSV.svelte';
+	import ExportYAML from './ExportYAML.svelte';
+	import ExportXML from './ExportXML.svelte';
+	import ExportXLSX from './ExportXLSX.svelte';
+	import ExportKML from './ExportKML.svelte';
 
 	const processing = writable<boolean>(false);
 	const errorMessage = writable<string>('');
 	let query: string = '';
-	let csvDownloadUrl: string = '';
-	let xlsxDownloadUrl: string = '';
-	let xmlDownloadUrl: string = '';
-	let kmlDownloadUrl: string = '';
-	let yamlDownloadUrl: string = '';
+	let data: any[] = [];
+	let includeKML: boolean = false;
 
 	async function handleExport() {
 		if (query.trim() === '') return;
 		errorMessage.set('');
-		csvDownloadUrl = '';
-		xlsxDownloadUrl = '';
-		xmlDownloadUrl = '';
-		kmlDownloadUrl = '';
-		yamlDownloadUrl = '';
+		data = [];
+		includeKML = query.includes('GetSearchResults');
 
 		try {
 			processing.set(true);
-			const data = await fetchData(query);
-			csvDownloadUrl = exportCSV(data);
-			xlsxDownloadUrl = exportXLSX(data);
-			xmlDownloadUrl = exportXML(data);
-			yamlDownloadUrl = exportYAML(data);
-			kmlDownloadUrl = query.includes('GetSearchResults') ? exportKML(data) : '';
+			data = await fetchData(query);
 		} catch (error) {
 			errorMessage.set(error instanceof Error ? error.message : 'Failed to export data.');
 		} finally {
@@ -47,6 +40,18 @@
 	{#if $errorMessage}
 		<p class="error" id="errorMessages">{$errorMessage}</p>
 	{/if}
-	<DownloadLinks {csvDownloadUrl} {xlsxDownloadUrl} {xmlDownloadUrl} {kmlDownloadUrl} {yamlDownloadUrl} />
+	{#if data.length}
+		<ExportCSV {data} />
+		<br />
+		<ExportYAML {data} />
+		<br />
+		<ExportXML {data} />
+		<br />
+		<ExportXLSX {data} />
+		<br />
+		{#if includeKML}
+			<ExportKML {data} />
+		{/if}
+	{/if}
 	<div id="description">Converts BMLT data from JSON to CSV, XLSX, XML, KML or YAML</div>
 </div>

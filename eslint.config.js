@@ -31,7 +31,7 @@ export default [
 		ignores: ['build/', '.svelte-kit/', 'dist/', '*.lock']
 	},
 	{
-		files: ['**/*.ts'],
+		files: ['**/*.ts', '**/*.svelte'],
 		rules: {
 			'@typescript-eslint/no-explicit-any': 'off'
 		}
