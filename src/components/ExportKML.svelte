@@ -1,10 +1,12 @@
 <script lang="ts">
 	import type { Meeting } from '../utils/DataUtils';
 
-	export let data: Meeting[];
-	let downloadUrl: string = '';
+	interface Props {
+		data: Meeting[];
+	}
 
-	$: downloadUrl = exportKML(data);
+	let { data }: Props = $props();
+	let downloadUrl: string = $derived(exportKML(data));
 
 	function exportKML(data: Meeting[]): string {
 		const placemarks = data.map(createPlacemark).filter(Boolean).join('\n');

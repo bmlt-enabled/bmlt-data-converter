@@ -2,10 +2,12 @@
 	import { processExportData } from '../utils/DataUtils';
 	import * as js2xmlparser from 'js2xmlparser';
 
-	export let data: any[];
-	let downloadUrl: string = '';
+	interface Props {
+		data: any[];
+	}
 
-	$: downloadUrl = exportXML(data);
+	let { data }: Props = $props();
+	let downloadUrl: string = $derived(exportXML(data));
 
 	function exportXML(data: any[]): string {
 		const processedData = processExportData(data);

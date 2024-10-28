@@ -2,10 +2,12 @@
 	import { processExportData } from '../utils/DataUtils';
 	import json2toml from 'json2toml';
 
-	export let data: any[];
-	let downloadUrl: string = '';
+	interface Props {
+		data: any[];
+	}
 
-	$: downloadUrl = exportTOML(data);
+	let { data }: Props = $props();
+	let downloadUrl: string = $derived(exportTOML(data));
 
 	function exportTOML(data: any[]): string {
 		const processedData = processExportData(data);

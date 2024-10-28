@@ -2,10 +2,12 @@
 	import { processExportData } from '../utils/DataUtils';
 	import * as yaml from 'js-yaml';
 
-	export let data: any[];
-	let downloadUrl: string = '';
+	interface Props {
+		data: any[];
+	}
 
-	$: downloadUrl = exportYAML(data);
+	let { data }: Props = $props();
+	let downloadUrl: string = $derived(exportYAML(data));
 
 	function exportYAML(data: any[]): string {
 		const processedData = processExportData(data);
