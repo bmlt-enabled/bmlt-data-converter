@@ -7,7 +7,7 @@
 </script>
 
 <div class="switch-container">
-	<button class="switch" on:click={toggleTheme} aria-label="Toggle theme">
+	<button class="switch" onclick={toggleTheme} aria-label="Toggle theme">
 		{#if $theme === 'dark'}
 			<i class="fas fa-moon icon"></i>
 		{:else}

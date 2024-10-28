@@ -2,10 +2,12 @@
 	import { processExportData, s2ab } from '../utils/DataUtils';
 	import * as XLSX from 'xlsx';
 
-	export let data: any[];
-	let downloadUrl: string = '';
+	interface Props {
+		data: any[];
+	}
 
-	$: downloadUrl = exportXLSX(data);
+	let { data }: Props = $props();
+	let downloadUrl: string = $derived(exportXLSX(data));
 
 	function exportXLSX(data: any[]): string {
 		const processedData = processExportData(data);

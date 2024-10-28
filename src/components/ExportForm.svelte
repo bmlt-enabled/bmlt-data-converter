@@ -10,9 +10,9 @@
 
 	const processing = writable<boolean>(false);
 	const errorMessage = writable<string>('');
-	let query: string = '';
-	let data: any[] = [];
-	let includeKML: boolean = false;
+	let query: string = $state('');
+	let data: any[] = $state([]);
+	let includeKML: boolean = $state(false);
 
 	async function handleExport() {
 		if (query.trim() === '') return;
@@ -30,14 +30,20 @@
 		}
 	}
 
-	$: if (query.trim() === '') {
-		errorMessage.set('');
-	}
+	$effect(() => {
+		if (query.trim() === '') {
+			errorMessage.set('');
+		}
+	});
 </script>
 
 <div id="inner-box">
-	<input type="text" bind:value={query} on:keydown={(event) => event.key === 'Enter' && handleExport()} placeholder="BMLT URL query..." />
-	<button disabled={$processing} on:click={handleExport} class={$processing ? 'button is-fullwidth generateButtonProcessing' : 'button is-fullwidth generateButton'}></button>
+	<input type="text" bind:value={query} onkeydown={(event) => event.key === 'Enter' && handleExport()} placeholder="BMLT URL query..." />
+	<button disabled={$processing} onclick={handleExport} class={$processing ? 'button is-fullwidth generateButtonProcessing' : 'button is-fullwidth generateButton'}>
+		{#if $processing}
+			Processing...
+		{/if} Export
+	</button>
 	{#if $errorMessage}
 		<p class="error" id="errorMessages">{$errorMessage}</p>
 	{/if}
