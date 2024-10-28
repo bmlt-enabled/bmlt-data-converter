@@ -5,6 +5,7 @@
 	import ExportYAML from './ExportYAML.svelte';
 	import ExportXML from './ExportXML.svelte';
 	import ExportXLSX from './ExportXLSX.svelte';
+	import ExportTOML from './ExportTOML.svelte';
 	import ExportKML from './ExportKML.svelte';
 
 	const processing = writable<boolean>(false);
@@ -43,6 +44,8 @@
 	{#if data.length}
 		<ExportCSV {data} />
 		<br />
+		<ExportTOML {data} />
+		<br />
 		<ExportYAML {data} />
 		<br />
 		<ExportXML {data} />
@@ -53,5 +56,5 @@
 			<ExportKML {data} />
 		{/if}
 	{/if}
-	<div id="description">Converts BMLT data from JSON to CSV, XLSX, XML, KML or YAML</div>
+	<div id="description">Converts BMLT data from JSON to CSV, XLSX, XML, KML, TOML or YAML</div>
 </div>
