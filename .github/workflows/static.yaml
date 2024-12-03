@@ -26,8 +26,6 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build
-        env:
-          NODE_ENV: production
         run: |
           npm ci
           npm run build
