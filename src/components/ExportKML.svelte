@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SvelteDate } from 'svelte/reactivity';
 	import type { Meeting } from '../utils/DataUtils';
 
 	interface Props {
@@ -62,7 +63,7 @@
 			const dayOfWeekInt = parseInt(meeting.weekday_tinyint?.trim() ?? '0');
 			const adjustedDay = dayOfWeekInt % 7;
 			// January 1, 2023, was a Sunday.
-			const baseDate = new Date('2023-01-01');
+			const baseDate = new SvelteDate('2023-01-01');
 			baseDate.setDate(baseDate.getDate() + adjustedDay);
 			const lang = meeting.lang_enum ? (meeting.lang_enum === 'dk' ? 'da' : meeting.lang_enum) : window.navigator.language;
 			const twelveHrLangs: string[] = ['en', 'es'];
