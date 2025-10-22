@@ -10,8 +10,8 @@ jobs:
       - name: checkout
         uses: actions/checkout@v5
 
-      - name: node 20
-        uses: actions/setup-node@v5
+      - name: node 22
+        uses: actions/setup-node@v6
         with:
           node-version: 22
 
